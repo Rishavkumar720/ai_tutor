@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark px-3">
+    <a class="navbar-brand" href="/">AI Tutor</a>
+
+    <div class="d-flex">
+        <a href="/dashboard/" class="btn btn-light me-2">Dashboard</a>
+        <form action="{% url 'logout' %}" method="post" class="d-inline">
+  {% csrf_token %}
+  <button class="btn btn-outline-danger btn-sm">Logout</button>
+</form>
+
+    </div>
+</nav>
+
+<div class="container py-5">
+
+    <h2 class="text-center fw-bold mb-4">📊 Your Dashboard</h2>
+
+    <div class="row">
+
+        <!-- Progress -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-body text-center">
+                    <h4 class="fw-bold">Progress</h4>
+                    <hr>
+                    {% if progress %}
+                        <p>Total Questions: {{ progress.total_questions }}</p>
+                        <p>Correct Answers: {{ progress.correct_answers }}</p>
+                    {% else %}
+                        <p>No progress yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat History -->
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h4 class="fw-bold">Previous Explanations</h4>
+                    <hr>
+                    {% for chat in chats %}
+                        <p><strong>{{ chat.topic }}</strong></p>
+                        <div class="border p-2 mb-3">{{ chat.response|safe }}</div>
+                    {% empty %}
+                        <p>No chat history.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Quiz History -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <h4 class="fw-bold">Quiz Results</h4>
+                    <hr>
+
+                    {% for q in quizzes %}
+                        <p>
+                            <strong>{{ q.question }}</strong><br>
+                            Your answer: {{ q.user_answer }}<br>
+                            Correct answer: {{ q.correct_answer }}<br>
+                            {% if q.is_correct %}
+                                ✅ Correct
+                            {% else %}
+                                ❌ Wrong
+                            {% endif %}
+                        </p>
+                        <hr>
+                    {% empty %}
+                        <p>No quiz results yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
