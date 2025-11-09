@@ -11,13 +11,15 @@ from .models import ChatHistory, QuizResult, UserProgress
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth import logout
+from django.contrib.auth.forms import UserCreationForm
 
 
-# Load API Key
-GROQ_API_KEY = settings.GROQ_API_KEY
+
+
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 if not GROQ_API_KEY:
-    raise ValueError("❌ GROQ_API_KEY NOT FOUND.")
+    raise ValueError("❌ GROQ_API_KEY NOT FOUND in environment variables.")
 
 llm = ChatGroq(
     groq_api_key=GROQ_API_KEY,
@@ -34,9 +36,6 @@ def tutor_view(request):
     if request.method == "POST":
         action = request.POST.get("action")
 
-        # ----------------------------------------------------
-        # ✅ Generate Explanation
-        # ----------------------------------------------------
         if action == "explain":
             topic = request.POST.get("topic")
 
@@ -54,9 +53,7 @@ def tutor_view(request):
                 response=explanation
             )
 
-            # ----------------------------------------------------
-            # ✅ Create 3-Question Quiz
-            # ----------------------------------------------------
+            
             quiz_prompt = [
                 SystemMessage(content="Return ONLY valid JSON."),
                 HumanMessage(content=f"""
@@ -94,16 +91,14 @@ def tutor_view(request):
                 quiz = None
                 request.session["quiz"] = None
 
-        # ----------------------------------------------------
-        # ✅ Submit Quiz Answer
-        # ----------------------------------------------------
+       
         elif action == "submit_quiz":
             quiz = request.session.get("quiz")
 
             if not quiz:
                 result = "Quiz not found. Generate a topic again."
             else:
-                # Identify which question user answered
+                
                 question_index = int(request.POST.get("question_index"))
                 current_q = quiz[question_index]
 
@@ -112,7 +107,7 @@ def tutor_view(request):
 
                 is_correct = user_answer == correct_answer
 
-                # Save result
+                
                 QuizResult.objects.create(
                     user=request.user,
                     question=current_q["question"],
@@ -135,8 +130,6 @@ def tutor_view(request):
         "result": result,
     })
 
-
-# ✅ Dashboard
 @login_required
 def dashboard(request):
     chats = ChatHistory.objects.filter(user=request.user).order_by("-created_at")

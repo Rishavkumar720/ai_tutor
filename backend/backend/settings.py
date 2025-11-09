@@ -21,7 +21,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "fallback-in-dev-only")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 
 
@@ -31,7 +32,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-t=pb5cvpyhwl5yi#a6qac3p68rlu@_l2a%_dv9ag8#ch77^c7^'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
